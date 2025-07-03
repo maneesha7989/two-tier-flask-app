@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Get Code') {
+            steps {
+                echo 'Code pulling started'
+                git url: "https://github.com/maneesha7989/two-tier-flask-app.git", branch: "master"
+            }
+        }
+        stage('Build') {
+            steps {
+                sh "docker build -t my-app ."
+            }
+        }
+        stage('PUSH to docker Hub'){
+            steps{
+                withCredentials([usernamePassword(
+                    credentialsId: "dockerHubCreds"
+                    passwordVariable: "dockerHubPass"
+                    usernameVariable: "dockerHubUser"
+                    
+                    sh "docker login -u "
+                    
+                    )])
+            }
+        }
+        stage('Deploy'){
+            steps{
+                sh "docker run -d --name maneesha nginx:latest ."
+            }
+        }
+    }
+}
